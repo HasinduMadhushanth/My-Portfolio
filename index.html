@@ -829,24 +829,28 @@
                         </div>
                     </div>
                     <form id="contact-form" class="glass">
-                        <div class="input-group">
-                            <input type="text" id="name" required>
-                            <label for="name">Alias / Name</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="email" id="email" required>
-                            <label for="email">Secure Email</label>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="subject" required>
-                            <label for="subject">Subject</label>
-                        </div>
-                        <div class="input-group">
-                            <textarea id="message" rows="5" required></textarea>
-                            <label for="message">Encrypted Message</label>
-                        </div>
-                        <button type="submit" class="btn primary-btn w-100">Send Transmission</button>
-                    </form>
+    <input type="hidden" name="access_key" value="5f086b88-30cc-44aa-8c0e-5501a49e4df9">
+    
+    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+    <div class="input-group">
+        <input type="text" id="name" name="name" required>
+        <label for="name">Alias / Name</label>
+    </div>
+    <div class="input-group">
+        <input type="email" id="email" name="email" required>
+        <label for="email">Secure Email</label>
+    </div>
+    <div class="input-group">
+        <input type="text" id="subject" name="subject" required>
+        <label for="subject">Subject</label>
+    </div>
+    <div class="input-group">
+        <textarea id="message" name="message" rows="5" required></textarea>
+        <label for="message">Encrypted Message</label>
+    </div>
+    <button type="submit" id="submit-btn" class="btn primary-btn w-100">Send Transmission</button>
+</form>
                 </div>
             </div>
         </section>
@@ -1065,6 +1069,52 @@
             animateParticles();
 
             // --- Form Validation Alert ---
+            // --- Advanced Form Transmission via Web3Forms API ---
+const contactForm = document.getElementById('contact-form');
+const submitBtn = document.getElementById('submit-btn');
+
+contactForm.addEventListener('submit', function(e) {
+    e.preventDefault(); // Stop page from refreshing
+    
+    // Visual feedback: simulate network uplink processing
+    submitBtn.innerText = "TRANSMITTING DATA...";
+    submitBtn.disabled = true;
+
+    const formData = new FormData(contactForm);
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: json
+    })
+    .then(async (response) => {
+        let res = await response.json();
+        if (response.status == 200) {
+            // Success State
+            alert('Transmission Successful! Message encrypted and routed to inbox.');
+            contactForm.reset();
+        } else {
+            // API Error State
+            console.log(res);
+            alert('Uplink Interrupted: ' + res.message);
+        }
+    })
+    .catch(error => {
+        // Network Error State
+        console.log(error);
+        alert('Transmission Failure: Check network configurations.');
+    })
+    .then(() => {
+        // Reset button state regardless of outcome
+        submitBtn.innerText = "Send Transmission";
+        submitBtn.disabled = false;
+    });
+});
             document.getElementById('contact-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 alert('Encrypted message ready for transmission. (Add backend integration to process form)');
